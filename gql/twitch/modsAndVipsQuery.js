@@ -1,38 +1,31 @@
 module.exports = function modsAndVipsQuery(targetUsername) {
   return {
     query: `
-      query mod {
+      query {
         user(login: "${targetUsername}") {
           mods: mods(first: 100) {
             edges {
-            grantedAt
+              grantedAt
+              isActive
               node {
                 id
                 login
                 displayName
               }
-            }
-            pageInfo {
-              hasNextPage
-              endCursor
             }
           }
           vips: vips(first: 100) {
             edges {
-            grantedAt
+              grantedAt
               node {
                 id
                 login
                 displayName
               }
             }
-            pageInfo {
-              hasNextPage
-              endCursor
-            }
           }
         }
       }
-    `,
+    `
   };
 };

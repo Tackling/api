@@ -5,6 +5,7 @@ const getGlobalBadgesQuery = require('./globalBadgesQuery');
 const getUserInfoQuery = require('./userInfoQuery');
 const getchannelFounderQuery = require('./channelFounderQuery');
 const pinnedMessageQueries = require('./pinnedMessageQuery');
+const getGameInfoQuery = require('./gameInfoQuery');
 
 module.exports = {
   getModsAndVipsQuery,
@@ -14,4 +15,5 @@ module.exports = {
   getUserInfoQuery,
   getchannelFounderQuery,
   ...pinnedMessageQueries,
+  getGameInfoQuery,
 };

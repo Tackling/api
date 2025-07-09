@@ -31,8 +31,8 @@ const swaggerDoc = {
   },
   servers: [
     {
-      url: 'http://localhost:3000/',
-      description: 'Local server',
+      url: 'http://api.tackling/docs',
+      description: 'api',
     },
   ],
   tags: [

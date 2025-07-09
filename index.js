@@ -31,8 +31,8 @@ const swaggerDoc = {
   },
   servers: [
     {
-      url: 'https://tackling-api.onrender.com/',
-      description: 'API',
+      url: 'http://localhost:3000/',
+      description: 'Local server',
     },
   ],
   tags: [
@@ -79,7 +79,7 @@ const swaggerDoc = {
         },
       },
     },
-        '/twitch/pinnedmessage': {
+    '/twitch/pinnedmessage': {
       get: {
         tags: ['Twitch'],
         summary: 'Get channels pinned message',
@@ -134,62 +134,62 @@ const swaggerDoc = {
       },
     },
     '/7tv/userinfo': {
-  get: {
-    tags: ['7TV'],
-    summary: 'Get 7TV user info',
-    parameters: [{ name: 'login', in: 'query', required: true, schema: { type: 'string' } }],
-    responses: {
-      200: {
-        description: 'Returns 7TV user info',
-        content: {
-          'application/json': {
-            schema: {
-              type: 'object',
+      get: {
+        tags: ['7TV'],
+        summary: 'Get 7TV user info',
+        parameters: [{ name: 'login', in: 'query', required: true, schema: { type: 'string' } }],
+        responses: {
+          200: {
+            description: 'Returns 7TV user info',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                },
+              },
             },
           },
         },
       },
     },
-  },
-},
-'/7tv/badgespaints': {
-  get: {
-    tags: ['7TV'],
-    summary: 'Get all 7TV badges and paints',
-    responses: {
-      200: {
-        description: 'Returns 7TV badge and paint data',
-        content: {
-          'application/json': {
-            schema: {
-              type: 'object',
+    '/7tv/badgespaints': {
+      get: {
+        tags: ['7TV'],
+        summary: 'Get all 7TV badges and paints',
+        responses: {
+          200: {
+            description: 'Returns 7TV badge and paint data',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                },
+              },
             },
           },
         },
       },
     },
-  },
-},
     '/7tv/usersubscriptioninfo': {
-  get: {
-    tags: ['7TV'],
-    summary: 'Get 7TV subscription info',
-    parameters: [{ name: 'login', in: 'query', required: true, schema: { type: 'string' } }],
-    responses: {
-      200: {
-        description: 'Returns 7TV user subscription info',
-        content: {
-          'application/json': {
-            schema: {
-              type: 'object',
+      get: {
+        tags: ['7TV'],
+        summary: 'Get 7TV subscription info',
+        parameters: [{ name: 'login', in: 'query', required: true, schema: { type: 'string' } }],
+        responses: {
+          200: {
+            description: 'Returns 7TV user subscription info',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                },
+              },
             },
           },
         },
       },
     },
-  },
-},
-'/7tv/userroles': {
+    '/7tv/userroles': {
       get: {
         tags: ['7TV'],
         summary: 'Get users 7TV roles',
@@ -209,13 +209,21 @@ const swaggerDoc = {
       },
     },
   },
-}; 
+};
 
-// Middleware and server start
+// Swagger docs
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
+
+// API routes
 app.use('/twitch', twitchRoutes);
 app.use('/7tv', sevenTvRoutes);
 
+// Root route to link to docs
+app.get('/', (req, res) => {
+  res.send('Docs can be found at: <a href="/docs">/docs</a>');
+});
+
+// Start server
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
   console.log(`Swagger docs available at http://localhost:${port}/docs`);

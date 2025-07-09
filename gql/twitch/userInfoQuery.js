@@ -68,6 +68,7 @@ module.exports = function getUserInfoQuery(username) {
       isDirectoryHidden
       broadcasterSoftware
       isEncrypted
+      isMature
       language
       restrictionType
       codec

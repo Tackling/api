@@ -92,6 +92,19 @@ const swaggerDoc = {
         },
       },
     },
+    '/twitch/userfollows': {
+      get: {
+        tags: ['Twitch'],
+        summary: 'Get a users Twitch follows',
+        parameters: [{ name: 'login', in: 'query', required: true, schema: { type: 'string' } }],
+        responses: {
+          200: {
+            description: 'Get a users Twitch follows',
+            content: { 'application/json': { schema: { type: 'object' } } },
+          },
+        },
+      },
+    },
     '/twitch/userbadges': {
       get: {
         tags: ['Twitch'],

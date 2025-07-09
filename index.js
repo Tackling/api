@@ -218,9 +218,39 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 app.use('/twitch', twitchRoutes);
 app.use('/7tv', sevenTvRoutes);
 
-// Root route to link to docs
 app.get('/', (req, res) => {
-  res.send('Docs can be found at: <a href="/docs">/docs</a>');
+  res.send(`
+    <html>
+      <head>
+        <title>API Docs</title>
+        <style>
+          body {
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+          }
+          a {
+            color: #0af;
+            text-decoration: none;
+            font-weight: bold;
+          }
+          a:hover {
+            text-decoration: underline;
+          }
+        </style>
+      </head>
+      <body>
+        <div>
+          Docs can be found at: <a href="/docs">/docs</a>
+        </div>
+      </body>
+    </html>
+  `);
 });
 
 // Start server

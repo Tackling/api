@@ -75,7 +75,6 @@ router.get('/pinnedmessage', async (req, res) => {
   }
 
   try {
-    // Step 1: Get user ID from username
     const useLiveQuery = gql.getUseLiveQuery(username);
     const useLiveResponse = await axios.post(TWITCH_GQL_URL, useLiveQuery, axiosOptions);
 
@@ -85,8 +84,6 @@ router.get('/pinnedmessage', async (req, res) => {
     }
 
     const channelID = user.id;
-
-    // Step 2: Use channel ID to get pinned messages
     const pinnedQuery = gql.getPinnedMessageQuery(channelID);
     const pinnedResponse = await axios.post(TWITCH_GQL_URL, pinnedQuery, axiosOptions);
 
@@ -252,6 +249,56 @@ router.get('/gameinfo', async (req, res) => {
       tags: game.tags || [],
     });
   } catch (err) {
+    res.status(500).json({
+      error: 'Twitch request failed',
+      details: err.response?.data || err.message,
+    });
+  }
+});
+
+router.get('/userfollows', async (req, res) => {
+  const login = req.query.login;
+  if (!login) return res.status(400).json({ error: 'Missing ?login=' });
+
+  let allFollows = [];
+  let after = null;
+  let hasNextPage = true;
+
+  try {
+    while (hasNextPage) {
+      console.log(`Fetching follows for ${login}, after: ${after || 'null'}`);
+
+      const gqlQuery = gql.getUserFollowsQuery(login, after);
+
+      const response = await axios.post(TWITCH_GQL_URL, gqlQuery, axiosOptions);
+      const userData = response.data?.data?.user;
+
+      if (!userData || !userData.follows) {
+        console.error('User or follows not found in response:', response.data);
+        return res.status(404).json({ error: 'User or follows not found' });
+      }
+
+      const follows = userData.follows;
+
+      allFollows.push(...follows.edges);
+      hasNextPage = follows.pageInfo.hasNextPage;
+      after = follows.pageInfo.endCursor;
+    }
+
+res.json({
+  totalCount: allFollows.length,
+  edges: allFollows.map(edge => ({
+    node: {
+      id: edge.node.id,
+      login: edge.node.login,
+      displayName: edge.node.displayName,
+      followedAt: edge.followedAt
+    }
+  }))
+});
+
+  } catch (err) {
+    console.error('Request failed:', err.response?.data || err.message);
     res.status(500).json({
       error: 'Twitch request failed',
       details: err.response?.data || err.message,

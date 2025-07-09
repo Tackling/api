@@ -6,6 +6,8 @@ const getUserInfoQuery = require('./userInfoQuery');
 const getchannelFounderQuery = require('./channelFounderQuery');
 const pinnedMessageQueries = require('./pinnedMessageQuery');
 const getGameInfoQuery = require('./gameInfoQuery');
+const getUserFollowsQuery = require('./userFollowsQuery');
+
 
 module.exports = {
   getModsAndVipsQuery,
@@ -16,4 +18,5 @@ module.exports = {
   getchannelFounderQuery,
   ...pinnedMessageQueries,
   getGameInfoQuery,
+  getUserFollowsQuery,
 };

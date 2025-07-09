@@ -215,6 +215,50 @@ router.get('/founders', async (req, res) => {
   }
 });
 
+router.get('/gameinfo', async (req, res) => {
+  const name = req.query.name;
+  if (!name) return res.status(400).json({ error: 'Missing ?name=' });
+
+  const gqlQuery = gql.getGameInfoQuery(name);
+
+  try {
+    const response = await axios.post(TWITCH_GQL_URL, gqlQuery, axiosOptions);
+    const game = response.data.data.game;
+
+    if (!game) {
+      return res.status(404).json({ error: 'Game not found' });
+    }
+
+    res.json({
+      id: game.id,
+      slug: game.slug,
+      name: game.name,
+      displayName: game.displayName,
+      description: game.description,
+      coverURL: game.coverURL,
+      avatarURL: game.avatarURL,
+      logoURL: game.logoURL,
+      popularityScore: game.popularityScore,
+      viewersCount: game.viewersCount,
+      followersCount: game.followersCount,
+      broadcastersCount: game.broadcastersCount,
+      developers: game.developers,
+      franchises: game.franchises,
+      platforms: game.platforms,
+      esrbRating: game.esrbRating,
+      esrbDescriptions: game.esrbDescriptions,
+      igdbURL: game.igdbURL,
+      prestoID: game.prestoID,
+      tags: game.tags || [],
+    });
+  } catch (err) {
+    res.status(500).json({
+      error: 'Twitch request failed',
+      details: err.response?.data || err.message,
+    });
+  }
+});
+
 router.get('/userinfo', async (req, res) => {
   const login = req.query.login;
   if (!login) return res.status(400).json({ error: 'Missing ?login=' });

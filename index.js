@@ -219,39 +219,32 @@ app.use('/twitch', twitchRoutes);
 app.use('/7tv', sevenTvRoutes);
 
 app.get('/', (req, res) => {
+  res.setHeader('Content-Type', 'text/html');
   res.send(`
     <html>
       <head>
-        <title>API Docs</title>
+        <title>API Root</title>
         <style>
           body {
-            background-color: black;
+            background-color: #121212;
             color: white;
-            font-family: Arial, sans-serif;
+            font-family: monospace;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
-          }
-          a {
-            color: #0af;
-            text-decoration: none;
-            font-weight: bold;
-          }
-          a:hover {
-            text-decoration: underline;
+            font-size: 1.2rem;
           }
         </style>
       </head>
       <body>
-        <div>
-          Docs can be found at: <a href="/docs">/docs</a>
-        </div>
+        {"docs found at /docs"}
       </body>
     </html>
   `);
 });
+
 
 // Start server
 app.listen(port, () => {

@@ -133,6 +133,19 @@ const swaggerDoc = {
         },
       },
     },
+    '/twitch/gameinfo': {
+      get: {
+        tags: ['Twitch'],
+        summary: 'Get a Twitch games info',
+        parameters: [{ name: 'name', in: 'query', required: true, schema: { type: 'string' } }],
+        responses: {
+          200: {
+            description: 'Get a Twitch games info',
+            content: { 'application/json': { schema: { type: 'object' } } },
+          },
+        },
+      },
+    },
     '/7tv/userinfo': {
       get: {
         tags: ['7TV'],

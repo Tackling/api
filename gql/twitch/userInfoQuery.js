@@ -58,16 +58,21 @@ module.exports = function getUserInfoQuery(username) {
             } 
             stream {
               id
-              type
-              title
-              viewersCount
-              createdAt
-              averageFPS
-              bitrate
-              broadcasterSoftware
-              codec
-              height
-              width
+      type
+      title
+      viewersCount
+      createdAt
+      clipCount
+      averageFPS
+      bitrate
+      isDirectoryHidden
+      broadcasterSoftware
+      isEncrypted
+      language
+      restrictionType
+      codec
+      height
+      width
               game {
                 name
                 id

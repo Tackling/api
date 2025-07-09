@@ -14,24 +14,41 @@ const axiosOptions = {
 
 router.get('/modvip', async (req, res) => {
   const login = req.query.login;
-  if (!login) return res.status(400).json({ error: 'Missing ?login=' });
+  if (!login) {
+    return res.status(400).json({ error: 'Missing ?login=' });
+  }
 
   const gqlQuery = gql.getModsAndVipsQuery(login);
 
   try {
     const response = await axios.post(TWITCH_GQL_URL, gqlQuery, axiosOptions);
+
     const user = response.data.data.user;
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
 
     const formatEdges = (edges) =>
       edges.map((edge) => ({
         ...edge.node,
         grantedAt: edge.grantedAt,
+        isActive: edge.isActive,
       }));
 
-    res.json({
-      mods: user.mods ? formatEdges(user.mods.edges) : [],
-      vips: user.vips ? formatEdges(user.vips.edges) : [],
-    });
+    const modsArray = user.mods?.edges ? formatEdges(user.mods.edges) : [];
+    const vipsArray = user.vips?.edges ? formatEdges(user.vips.edges) : [];
+
+    const mods = {
+      totalCount: modsArray.length,
+      items: modsArray,
+    };
+
+    const vips = {
+      totalCount: vipsArray.length,
+      items: vipsArray,
+    };
+
+    res.json({ mods, vips });
   } catch (err) {
     res.status(500).json({
       error: 'Twitch request failed',

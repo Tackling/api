@@ -41,6 +41,7 @@ module.exports = function getUserInfoQuery(username) {
               isSiteAdmin
               isGlobalMod
               isExtensionsDeveloper
+              isExtensionsApprover
             }
             hasTurbo
             primaryTeam {

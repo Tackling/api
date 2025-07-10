@@ -484,6 +484,7 @@ const finalResponse = {
     isSiteAdmin: rawUser?.roles?.isSiteAdmin ?? null,
     isGlobalMod: rawUser?.roles?.isGlobalMod ?? null,
     isExtensionsDeveloper: rawUser?.roles?.isExtensionsDeveloper ?? null,
+    isExtensionsApprover: rawUser?.roles?.isExtensionsApprover ?? null,
   },
   badge: displayBadges, 
   stream: rawUser?.stream ?? null,

@@ -105,6 +105,28 @@ const swaggerDoc = {
         },
       },
     },
+    '/twitch/userfollowers': {
+  get: {
+    tags: ['Twitch'],
+    summary: 'Get a users Twitch followers',
+    parameters: [
+      { name: 'login', in: 'query', required: true, schema: { type: 'string' } },
+      {
+        name: 'limit',
+        in: 'query',
+        required: false,
+        schema: { type: 'integer', minimum: 1, maximum: 10000, default: 100 },
+        description: 'Number of followers to fetch, max 10,000 (large requests may take some time). Defaults to 100.',
+      },
+    ],
+    responses: {
+      200: {
+        description: 'Get a users Twitch followers',
+        content: { 'application/json': { schema: { type: 'object' } } },
+      },
+    },
+  },
+},
     '/twitch/userbadges': {
       get: {
         tags: ['Twitch'],

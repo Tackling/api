@@ -323,6 +323,66 @@ res.json({
   }
 });
 
+router.get('/userfollowers', async (req, res) => {
+  const login = req.query.login;
+  if (!login) return res.status(400).json({ error: 'Missing ?login=' });
+
+  let limit = parseInt(req.query.limit, 10);
+  if (isNaN(limit) || limit < 1) limit = 100;
+  if (limit > 10000) limit = 10000;
+
+  let allFollowers = [];
+  let after = null;
+  let hasNextPage = true;
+  let totalCount = 0;
+
+  try {
+    while (hasNextPage && allFollowers.length < limit) {
+
+      const remaining = limit - allFollowers.length;
+      const fetchCount = remaining > 100 ? 100 : remaining;
+      const gqlQuery = gql.getUserFollowersQuery(login, after, fetchCount);
+      const response = await axios.post(TWITCH_GQL_URL, gqlQuery, axiosOptions);
+      const userData = response.data?.data?.user;
+
+      if (!userData || !userData.followers) {
+        return res.status(404).json({ error: 'User or followers not found' });
+      }
+
+      const followers = userData.followers;
+      totalCount = followers.totalCount;
+      const edges = followers.edges.filter(edge => edge.node !== null);
+
+      allFollowers.push(...edges);
+
+      hasNextPage = followers.pageInfo.hasNextPage;
+
+      if (hasNextPage && edges.length > 0) {
+        after = edges[edges.length - 1].cursor;
+      } else {
+        after = null;
+      }
+    }
+
+    const formattedFollowers = allFollowers.slice(0, limit).map(edge => ({
+      id: edge.node.id,
+      login: edge.node.login,
+      displayName: edge.node.displayName,
+      followedAt: edge.followedAt,
+    }));
+
+    res.json({
+      totalCount,
+      followers: formattedFollowers,
+    });
+  } catch (err) {
+    res.status(500).json({
+      error: 'Twitch request failed',
+      details: err.response?.data || err.message,
+    });
+  }
+});
+
 router.get('/userinfo', async (req, res) => {
   const login = req.query.login;
   if (!login) return res.status(400).json({ error: 'Missing ?login=' });

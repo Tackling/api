@@ -136,31 +136,57 @@ router.get('/pinnedmessage', async (req, res) => {
 
 router.get('/team', async (req, res) => {
   const teamName = req.query.team;
+
   if (!teamName) return res.status(400).json({ error: 'Missing ?team=' });
 
-  const gqlQuery = gql.getTeamInfoQuery(teamName);
-
   try {
-    const response = await axios.post(TWITCH_GQL_URL, gqlQuery, axiosOptions);
+    let allMembers = [];
+    let allLiveMembers = [];
+    let afterMembers = null;
+    let afterLive = null;
+    let teamData = null;
 
-    const memberListData = response.data[0]?.data?.team;
-    const bodyData = response.data[1]?.data?.team;
+    do {
+      const gqlQuery = gql.getTeamInfoQuery(teamName, afterMembers, afterLive)[0];
+      const response = await axios.post(TWITCH_GQL_URL, gqlQuery, axiosOptions);
+      console.log(JSON.stringify(response.data, null, 2));
 
-    const totalCount = memberListData?.members?.totalCount || 0;
-    const members = (memberListData?.members?.edges || []).map(edge => edge.node);
-    const owner = memberListData?.owner || null;
-    const teamInfo = bodyData || null;
+      teamData = response.data?.data?.team;
+      if (!teamData) {
+        return res.status(404).json({ error: 'Team not found' });
+      }
 
-    const output = [
-      { totalCount },
-      {
-        team: teamInfo,
-        owner,
+      const membersEdges = teamData.members?.edges || [];
+      allMembers.push(...membersEdges.map(edge => edge.node));
+      afterMembers = teamData.members?.pageInfo?.hasNextPage ? teamData.members.pageInfo.endCursor : null;
+
+      const liveMembersEdges = teamData.liveMembers?.edges || [];
+      allLiveMembers.push(...liveMembersEdges.map(edge => edge.node));
+      afterLive = teamData.liveMembers?.pageInfo?.hasNextPage ? teamData.liveMembers.pageInfo.endCursor : null;
+
+    } while (afterMembers || afterLive);
+
+    const owner = teamData.owner || null;
+
+    const output = {
+      totalCount: teamData.members?.totalCount || 0,
+      team: {
+        id: teamData.id,
+        name: teamData.name,
+        displayName: teamData.displayName,
+        description: teamData.description,
+        backgroundImageID: teamData.backgroundImageID,
+        backgroundImageURL: teamData.backgroundImageURL,
+        bannerID: teamData.bannerID,
+        bannerURL: teamData.bannerURL,
+        logoID: teamData.logoID,
+        logoURL: teamData.logoURL,
+        liveMembers: allLiveMembers,
+        liveFeaturedChannels: (teamData.liveFeaturedChannels?.edges || []).map(edge => edge.node),
       },
-      {
-        members,
-      },
-    ];
+      owner,
+      members: allMembers,
+    };
 
     res.json(output);
   } catch (err) {
@@ -170,7 +196,6 @@ router.get('/team', async (req, res) => {
     });
   }
 });
-
 
 router.get('/globalbadges', async (req, res) => {
   const gqlQuery = gql.getGlobalBadgesQuery();

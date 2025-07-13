@@ -158,11 +158,11 @@ const swaggerDoc = {
     '/twitch/team': {
       get: {
         tags: ['Twitch'],
-        summary: 'Get a user’s Twitch team info',
+        summary: 'Get a Twitch teams info',
         parameters: [{ name: 'team', in: 'query', required: true, schema: { type: 'string' } }],
         responses: {
           200: {
-            description: 'Get a user’s Twitch team info',
+            description: 'Get a Twitch teams info',
             content: { 'application/json': { schema: { type: 'object' } } },
           },
         },

@@ -31,62 +31,36 @@ const swaggerDoc = {
   },
   servers: [
     {
-      url: 'https://api.tackling.cc/',
-      description: 'api',
+      url: 'http://localhost:3000/',
+      description: 'Local server',
     },
   ],
   tags: [
-    { name: 'Twitch', description: 'Twitch endpoints' },
-    { name: '7TV', description: '7TV endpoints' },
+    { name: 'Twitch: User', description: 'Twitch user endpoints' },
+    { name: 'Twitch: Channel', description: 'Twitch channel endpoints' },
+    { name: 'Twitch: Global', description: 'Twitch global endpoints' },
+    { name: '7TV: User', description: '7TV user endpoints' },
+    { name: '7TV: Global', description: '7TV global endpoints' },
+  ],
+  'x-tagGroups': [
+    {
+      name: 'Twitch',
+      tags: ['Twitch: User', 'Twitch: Channel', 'Twitch: Global'],
+    },
+    {
+      name: '7TV',
+      tags: ['7TV: User', '7TV: Global'],
+    },
   ],
   paths: {
     '/twitch/userinfo': {
       get: {
-        tags: ['Twitch'],
-        summary: 'Get combined Twitch user info',
+        tags: ['Twitch: User'],
+        summary: 'Get Twitch user info',
         parameters: [{ name: 'login', in: 'query', required: true, schema: { type: 'string' } }],
         responses: {
           200: {
-            description: 'Basic Twitch user data',
-            content: { 'application/json': { schema: { type: 'object' } } },
-          },
-        },
-      },
-    },
-    '/twitch/modvip': {
-      get: {
-        tags: ['Twitch'],
-        summary: 'Get Twitch channel moderators and VIPs',
-        parameters: [{ name: 'login', in: 'query', required: true, schema: { type: 'string' } }],
-        responses: {
-          200: {
-            description: 'List of moderators and VIPs',
-            content: { 'application/json': { schema: { type: 'object' } } },
-          },
-        },
-      },
-    },
-    '/twitch/founders': {
-      get: {
-        tags: ['Twitch'],
-        summary: 'Get Twitch channel founders',
-        parameters: [{ name: 'login', in: 'query', required: true, schema: { type: 'string' } }],
-        responses: {
-          200: {
-            description: 'List of founders',
-            content: { 'application/json': { schema: { type: 'object' } } },
-          },
-        },
-      },
-    },
-    '/twitch/pinnedmessage': {
-      get: {
-        tags: ['Twitch'],
-        summary: 'Get channels pinned message',
-        parameters: [{ name: 'login', in: 'query', required: true, schema: { type: 'string' } }],
-        responses: {
-          200: {
-            description: 'Get channels pinned message',
+            description: 'Twitch user data',
             content: { 'application/json': { schema: { type: 'object' } } },
           },
         },
@@ -94,7 +68,7 @@ const swaggerDoc = {
     },
     '/twitch/userfollows': {
       get: {
-        tags: ['Twitch'],
+        tags: ['Twitch: User'],
         summary: 'Get a users Twitch follows',
         parameters: [{ name: 'login', in: 'query', required: true, schema: { type: 'string' } }],
         responses: {
@@ -106,30 +80,30 @@ const swaggerDoc = {
       },
     },
     '/twitch/userfollowers': {
-  get: {
-    tags: ['Twitch'],
-    summary: 'Get a users Twitch followers',
-    parameters: [
-      { name: 'login', in: 'query', required: true, schema: { type: 'string' } },
-      {
-        name: 'limit',
-        in: 'query',
-        required: false,
-        schema: { type: 'integer', minimum: 1, maximum: 10000, default: 100 },
-        description: 'Number of followers to fetch, max 10,000 (large requests may take some time). Defaults to 100.',
-      },
-    ],
-    responses: {
-      200: {
-        description: 'Get a users Twitch followers',
-        content: { 'application/json': { schema: { type: 'object' } } },
+      get: {
+        tags: ['Twitch: User'],
+        summary: 'Get a users Twitch followers',
+        parameters: [
+          { name: 'login', in: 'query', required: true, schema: { type: 'string' } },
+          {
+            name: 'limit',
+            in: 'query',
+            required: false,
+            schema: { type: 'integer', minimum: 1, maximum: 10000, default: 100 },
+            description: 'Number of followers to fetch, max 10,000. Defaults to 100.',
+          },
+        ],
+        responses: {
+          200: {
+            description: 'Get a users Twitch followers',
+            content: { 'application/json': { schema: { type: 'object' } } },
+          },
+        },
       },
     },
-  },
-},
     '/twitch/userbadges': {
       get: {
-        tags: ['Twitch'],
+        tags: ['Twitch: User'],
         summary: 'Get badges a user owns in a channel',
         parameters: [
           { name: 'login', in: 'query', required: true, schema: { type: 'string' } },
@@ -143,9 +117,48 @@ const swaggerDoc = {
         },
       },
     },
+    '/twitch/modvip': {
+      get: {
+        tags: ['Twitch: Channel'],
+        summary: 'Get Twitch channel moderators and VIPs',
+        parameters: [{ name: 'login', in: 'query', required: true, schema: { type: 'string' } }],
+        responses: {
+          200: {
+            description: 'List of moderators and VIPs',
+            content: { 'application/json': { schema: { type: 'object' } } },
+          },
+        },
+      },
+    },
+    '/twitch/founders': {
+      get: {
+        tags: ['Twitch: Channel'],
+        summary: 'Get Twitch channel founders',
+        parameters: [{ name: 'login', in: 'query', required: true, schema: { type: 'string' } }],
+        responses: {
+          200: {
+            description: 'List of founders',
+            content: { 'application/json': { schema: { type: 'object' } } },
+          },
+        },
+      },
+    },
+    '/twitch/pinnedmessage': {
+      get: {
+        tags: ['Twitch: Channel'],
+        summary: 'Get channels pinned message',
+        parameters: [{ name: 'login', in: 'query', required: true, schema: { type: 'string' } }],
+        responses: {
+          200: {
+            description: 'Pinned message data',
+            content: { 'application/json': { schema: { type: 'object' } } },
+          },
+        },
+      },
+    },
     '/twitch/globalbadges': {
       get: {
-        tags: ['Twitch'],
+        tags: ['Twitch: Global'],
         summary: 'Get all global Twitch badges',
         responses: {
           200: {
@@ -157,12 +170,12 @@ const swaggerDoc = {
     },
     '/twitch/team': {
       get: {
-        tags: ['Twitch'],
+        tags: ['Twitch: Global'],
         summary: 'Get a Twitch teams info',
         parameters: [{ name: 'team', in: 'query', required: true, schema: { type: 'string' } }],
         responses: {
           200: {
-            description: 'Get a Twitch teams info',
+            description: 'Twitch team data',
             content: { 'application/json': { schema: { type: 'object' } } },
           },
         },
@@ -170,12 +183,12 @@ const swaggerDoc = {
     },
     '/twitch/gameinfo': {
       get: {
-        tags: ['Twitch'],
+        tags: ['Twitch: Global'],
         summary: 'Get a Twitch games info',
         parameters: [{ name: 'name', in: 'query', required: true, schema: { type: 'string' } }],
         responses: {
           200: {
-            description: 'Get a Twitch games info',
+            description: 'Twitch game info',
             content: { 'application/json': { schema: { type: 'object' } } },
           },
         },
@@ -183,75 +196,51 @@ const swaggerDoc = {
     },
     '/7tv/userinfo': {
       get: {
-        tags: ['7TV'],
+        tags: ['7TV: User'],
         summary: 'Get 7TV user info',
         parameters: [{ name: 'login', in: 'query', required: true, schema: { type: 'string' } }],
         responses: {
           200: {
             description: 'Returns 7TV user info',
-            content: {
-              'application/json': {
-                schema: {
-                  type: 'object',
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-    '/7tv/badgespaints': {
-      get: {
-        tags: ['7TV'],
-        summary: 'Get all 7TV badges and paints',
-        responses: {
-          200: {
-            description: 'Returns 7TV badge and paint data',
-            content: {
-              'application/json': {
-                schema: {
-                  type: 'object',
-                },
-              },
-            },
+            content: { 'application/json': { schema: { type: 'object' } } },
           },
         },
       },
     },
     '/7tv/usersubscriptioninfo': {
       get: {
-        tags: ['7TV'],
+        tags: ['7TV: User'],
         summary: 'Get 7TV subscription info',
         parameters: [{ name: 'login', in: 'query', required: true, schema: { type: 'string' } }],
         responses: {
           200: {
             description: 'Returns 7TV user subscription info',
-            content: {
-              'application/json': {
-                schema: {
-                  type: 'object',
-                },
-              },
-            },
+            content: { 'application/json': { schema: { type: 'object' } } },
           },
         },
       },
     },
     '/7tv/userroles': {
       get: {
-        tags: ['7TV'],
+        tags: ['7TV: User'],
         summary: 'Get users 7TV roles',
         parameters: [{ name: 'login', in: 'query', required: true, schema: { type: 'string' } }],
         responses: {
           200: {
             description: 'Returns users 7TV roles',
-            content: {
-              'application/json': {
-                schema: {
-                  type: 'object',
-                },
-              },
-            },
+            content: { 'application/json': { schema: { type: 'object' } } },
+          },
+        },
+      },
+    },
+    '/7tv/badgespaints': {
+      get: {
+        tags: ['7TV: Global'],
+        summary: 'Get all 7TV badges and paints',
+        responses: {
+          200: {
+            description: 'Returns 7TV badge and paint data',
+            content: { 'application/json': { schema: { type: 'object' } } },
           },
         },
       },

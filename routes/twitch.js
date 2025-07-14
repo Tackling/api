@@ -134,6 +134,76 @@ router.get('/pinnedmessage', async (req, res) => {
   }
 });
 
+router.get('/clipinfo', async (req, res) => {
+  const slug = req.query.slug;
+  if (!slug) {
+    return res.status(400).json({ error: 'Missing ?slug=' });
+  }
+
+  const gqlQuery = gql.getClipInfoQuery(slug);
+
+  try {
+    const response = await axios.post(TWITCH_GQL_URL, gqlQuery, axiosOptions);
+    const data = response.data;
+
+    if (data.errors) {
+      return res.status(400).json({ error: data.errors });
+    }
+
+    const clip = data?.[0]?.data?.clip;
+
+    if (!clip) {
+      return res.status(404).json({ error: 'Clip not found' });
+    }
+
+    const formatted = {
+      id: clip.id,
+      slug: clip.slug,
+      title: clip.title,
+      url: clip.url,
+      embedURL: clip.embedURL,
+      thumbnailURL: clip.thumbnailURL,
+      createdAt: clip.createdAt,
+      durationSeconds: clip.durationSeconds,
+      viewCount: clip.viewCount,
+      language: clip.language,
+      isPublished: clip.isPublished,
+      videoOffsetSeconds: clip.videoOffsetSeconds,
+      broadcaster: {
+        id: clip.broadcaster?.id,
+        login: clip.broadcaster?.login,
+        displayName: clip.broadcaster?.displayName,
+      },
+      curator: {
+        id: clip.curator?.id,
+        login: clip.curator?.login,
+        displayName: clip.curator?.displayName,
+      },
+      game: {
+        id: clip.game?.id,
+        name: clip.game?.name,
+        displayName: clip.game?.displayName,
+      },
+      video: {
+        id: clip.video?.id,
+        title: clip.video?.title,
+      },
+      broadcast: {
+        id: clip.broadcast?.id,
+      },
+      creationState: clip.creationState,
+      videoQualities: clip.videoQualities || [],
+    };
+
+    res.json(formatted);
+  } catch (err) {
+    res.status(500).json({
+      error: 'Twitch request failed',
+      details: err.response?.data || err.message,
+    });
+  }
+});
+
 router.get('/team', async (req, res) => {
   const teamName = req.query.team;
 

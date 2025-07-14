@@ -157,6 +157,19 @@ const swaggerDoc = {
         },
       },
     },
+         '/twitch/clipinfo': {
+      get: {
+        tags: ['Twitch: Channel'],
+        summary: 'Get Twitch clip info',
+        parameters: [{ name: 'slug', in: 'query', required: true, schema: { type: 'string' } }],
+        responses: {
+          200: {
+            description: 'Twitch clip info',
+            content: { 'application/json': { schema: { type: 'object' } } },
+          },
+        },
+      },
+    },
     '/twitch/globalbadges': {
       get: {
         tags: ['Twitch: Global'],

@@ -13,9 +13,10 @@ app.use((req, res, next) => {
   res.on('finish', () => {
     const duration = Date.now() - start;
     const memoryUsedMB = process.memoryUsage().heapUsed / 1024 / 1024;
+    const rssMB = process.memoryUsage().rss / 1024 / 1024;
 
     console.log(
-      `${req.method} ${req.originalUrl} - ${duration} ms - ${memoryUsedMB.toFixed(2)} MB`
+      `${req.method} ${req.originalUrl} - ${duration} ms - ${memoryUsedMB.toFixed(2)} MB - rss ${rssMB.toFixed(2)} MB`
     );
   });
 

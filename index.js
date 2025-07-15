@@ -1,47 +1,10 @@
-require('dotenv').config();
-const express = require('express');
-const swaggerUi = require('swagger-ui-express');
-const twitchRoutes = require('./routes/twitch');
-const sevenTvRoutes = require('./routes/seventv'); // new
-
-const app = express();
-const port = 3000;
-
-app.use((req, res, next) => {
-  const start = Date.now();
-
-  res.on('finish', () => {
-    const duration = Date.now() - start;
-    const memoryUsedMB = process.memoryUsage().heapUsed / 1024 / 1024;
-    const rssMB = process.memoryUsage().rss / 1024 / 1024;
-
-    console.log(
-      `${req.method} ${req.originalUrl} - ${duration} ms - ${memoryUsedMB.toFixed(2)} MB - rss ${rssMB.toFixed(2)} MB`
-    );
-  });
-
-  next();
-});
-
-const swaggerDoc = {
-  openapi: '3.0.0',
-  info: {
-    title: 'Twitch & 7TV API',
-    version: '1.0.0',
-    description: 'API for retrieving Twitch and 7TV data',
-  },
-  servers: [
-    {
-      url: 'https://api.tackling.cc/',
-      description: 'api',
-    },
-  ],
-  tags: [
+tags: [
     { name: 'Twitch: User', description: 'Twitch user endpoints' },
     { name: 'Twitch: Channel', description: 'Twitch channel endpoints' },
     { name: 'Twitch: Global', description: 'Twitch global endpoints' },
     { name: '7TV: User', description: '7TV user endpoints' },
     { name: '7TV: Global', description: '7TV global endpoints' },
+    { name: 'Misc', description: 'API info endpoints' },
   ],
   'x-tagGroups': [
     {
@@ -157,7 +120,7 @@ const swaggerDoc = {
         },
       },
     },
-         '/twitch/clipinfo': {
+    '/twitch/clipinfo': {
       get: {
         tags: ['Twitch: Channel'],
         summary: 'Get Twitch clip info',
@@ -259,45 +222,32 @@ const swaggerDoc = {
         },
       },
     },
+    '/misc/ping': {
+      get: {
+        tags: ['Misc'],
+        summary: 'API ping check',
+        responses: {
+          200: {
+            description: 'Returns ping and server info',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   },
 };
 
-// Swagger docs
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
-
-// API routes
 app.use('/twitch', twitchRoutes);
 app.use('/7tv', sevenTvRoutes);
+app.use('/misc', miscRoutes);
 
-app.get('/', (req, res) => {
-  res.setHeader('Content-Type', 'text/html');
-  res.send(`
-    <html>
-      <head>
-        <title>API Root</title>
-        <style>
-          body {
-            background-color: #121212;
-            color: white;
-            font-family: monospace;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            font-size: 1.2rem;
-          }
-        </style>
-      </head>
-      <body>
-        {"docs found at /docs"}
-      </body>
-    </html>
-  `);
-});
-
-
-// Start server
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
   console.log(`Swagger docs available at http://localhost:${port}/docs`);

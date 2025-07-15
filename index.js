@@ -2,7 +2,8 @@ require('dotenv').config();
 const express = require('express');
 const swaggerUi = require('swagger-ui-express');
 const twitchRoutes = require('./routes/twitch');
-const sevenTvRoutes = require('./routes/seventv'); // new
+const sevenTvRoutes = require('./routes/seventv');
+const miscRoutes = require('./routes/misc');
 
 const app = express();
 const port = 3000;

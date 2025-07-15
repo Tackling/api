@@ -1,4 +1,42 @@
-tags: [
+require('dotenv').config();
+const express = require('express');
+const swaggerUi = require('swagger-ui-express');
+const twitchRoutes = require('./routes/twitch');
+const sevenTvRoutes = require('./routes/seventv'); // new
+
+const app = express();
+const port = 3000;
+
+app.use((req, res, next) => {
+  const start = Date.now();
+
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    const memoryUsedMB = process.memoryUsage().heapUsed / 1024 / 1024;
+    const rssMB = process.memoryUsage().rss / 1024 / 1024;
+
+    console.log(
+      `${req.method} ${req.originalUrl} - ${duration} ms - ${memoryUsedMB.toFixed(2)} MB - rss ${rssMB.toFixed(2)} MB`
+    );
+  });
+
+  next();
+});
+
+const swaggerDoc = {
+  openapi: '3.0.0',
+  info: {
+    title: 'Twitch & 7TV API',
+    version: '1.0.0',
+    description: 'API for retrieving Twitch and 7TV data',
+  },
+  servers: [
+    {
+      url: 'https://api.tackling.cc/',
+      description: 'api',
+    },
+  ],
+  tags: [
     { name: 'Twitch: User', description: 'Twitch user endpoints' },
     { name: 'Twitch: Channel', description: 'Twitch channel endpoints' },
     { name: 'Twitch: Global', description: 'Twitch global endpoints' },

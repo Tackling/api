@@ -264,7 +264,7 @@ const swaggerDoc = {
     '/misc/misc': {
       get: {
         tags: ['Misc'],
-        summary: 'API ping check',
+        summary: 'API info',
         responses: {
           200: {
             description: 'Returns ping and server info',

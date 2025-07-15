@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-router.get('/ping', async (req, res) => {
+router.get('/misc', async (req, res) => {
   const start = Date.now();
   await new Promise(resolve => setTimeout(resolve, 5));
   const ping = Date.now() - start;

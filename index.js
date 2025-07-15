@@ -261,7 +261,7 @@ const swaggerDoc = {
         },
       },
     },
-    '/misc/ping': {
+    '/misc/misc': {
       get: {
         tags: ['Misc'],
         summary: 'API ping check',
@@ -286,8 +286,33 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 app.use('/twitch', twitchRoutes);
 app.use('/7tv', sevenTvRoutes);
 app.use('/misc', miscRoutes);
+app.get('/', (req, res) => {
+  res.setHeader('Content-Type', 'text/html');
+  res.send(`
+    <html>
+      <head>
+        <title>API Root</title>
+        <style>
+          body {
+            background-color: #121212;
+            color: white;
+            font-family: monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-size: 1.2rem;
+          }
+        </style>
+      </head>
+      <body>
+        {"docs found at /docs"}
+      </body>
+    </html>
+  `);
+});
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
   console.log(`Swagger docs available at http://localhost:${port}/docs`);
-});

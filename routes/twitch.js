@@ -576,6 +576,30 @@ router.get('/userfirstfollows', async (req, res) => {
   }
 });
 
+router.get('/usernameavailable', async (req, res) => {
+  const username = req.query.username;
+  if (!username) return res.status(400).json({ error: 'Missing ?username=' });
+
+  try {
+    const gqlQuery = gql.getUsernameAvailableQuery(username);
+
+    const response = await axios.post(TWITCH_GQL_URL, gqlQuery, axiosOptions);
+    const available = response.data?.data?.isUsernameAvailable;
+
+    if (typeof available !== 'boolean') {
+      return res.status(404).json({ error: 'Username availability info not found' });
+    }
+
+    res.json({ available });
+  } catch (err) {
+    console.error('Request failed:', err.response?.data || err.message);
+    res.status(500).json({
+      error: 'Twitch request failed',
+      details: err.response?.data || err.message
+    });
+  }
+});
+
 router.get('/userinfo', async (req, res) => {
   const login = req.query.login;
   if (!login) return res.status(400).json({ error: 'Missing ?login=' });

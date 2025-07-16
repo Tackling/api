@@ -11,6 +11,7 @@ const getUserFollowersQuery = require('./userFollowersQuery');
 const getClipInfoQuery = require('./clipInfoQuery');
 const getUserRecentFollowQuery = require('./userRecentFollowQuery');
 const getUserFirstFollowQuery = require('./userFirstFollowQuery');
+const getUsernameAvailableQuery = require('./usernameAvailableQuery');
 
 
 module.exports = {
@@ -27,4 +28,5 @@ module.exports = {
   getClipInfoQuery,
   getUserRecentFollowQuery,
   getUserFirstFollowQuery,
+  getUsernameAvailableQuery,
 };

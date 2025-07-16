@@ -56,7 +56,7 @@ const swaggerDoc = {
     },
   ],
   paths: {
-    '/twitch/userinfo': {
+    '/twitch/UserInfo': {
       get: {
         tags: ['Twitch: User'],
         summary: 'Get Twitch user info',
@@ -69,7 +69,7 @@ const swaggerDoc = {
         },
       },
     },
-    '/twitch/userfollows': {
+    '/twitch/UserFollows': {
       get: {
         tags: ['Twitch: User'],
         summary: 'Get a users Twitch follows',
@@ -82,7 +82,7 @@ const swaggerDoc = {
         },
       },
     },
-    '/twitch/userfollowers': {
+    '/twitch/UserFollowers': {
       get: {
         tags: ['Twitch: User'],
         summary: 'Get a users Twitch followers',
@@ -104,7 +104,7 @@ const swaggerDoc = {
         },
       },
     },
-    '/twitch/userbadges': {
+    '/twitch/UserBadges': {
       get: {
         tags: ['Twitch: User'],
         summary: 'Get badges a user owns in a channel',
@@ -146,7 +146,7 @@ const swaggerDoc = {
         },
       },
     },
-    '/twitch/modvip': {
+    '/twitch/ModVip': {
       get: {
         tags: ['Twitch: Channel'],
         summary: 'Get Twitch channel moderators and VIPs',
@@ -159,7 +159,7 @@ const swaggerDoc = {
         },
       },
     },
-    '/twitch/founders': {
+    '/twitch/Founders': {
       get: {
         tags: ['Twitch: Channel'],
         summary: 'Get Twitch channel founders',
@@ -172,7 +172,7 @@ const swaggerDoc = {
         },
       },
     },
-    '/twitch/pinnedmessage': {
+    '/twitch/PinnedMessage': {
       get: {
         tags: ['Twitch: Channel'],
         summary: 'Get channels pinned message',
@@ -185,7 +185,7 @@ const swaggerDoc = {
         },
       },
     },
-    '/twitch/clipinfo': {
+    '/twitch/ClipInfo': {
       get: {
         tags: ['Twitch: Channel'],
         summary: 'Get Twitch clip info',
@@ -198,7 +198,7 @@ const swaggerDoc = {
         },
       },
     },
-    '/twitch/globalbadges': {
+    '/twitch/GlobalBadges': {
       get: {
         tags: ['Twitch: Global'],
         summary: 'Get all global Twitch badges',
@@ -210,7 +210,7 @@ const swaggerDoc = {
         },
       },
     },
-    '/twitch/team': {
+    '/twitch/Team': {
       get: {
         tags: ['Twitch: Global'],
         summary: 'Get a Twitch teams info',
@@ -223,7 +223,7 @@ const swaggerDoc = {
         },
       },
     },
-    '/twitch/gameinfo': {
+    '/twitch/GameInfo': {
       get: {
         tags: ['Twitch: Global'],
         summary: 'Get a Twitch games info',
@@ -236,7 +236,7 @@ const swaggerDoc = {
         },
       },
     },
-    '/7tv/userinfo': {
+    '/7tv/UserInfo': {
       get: {
         tags: ['7TV: User'],
         summary: 'Get 7TV user info',
@@ -249,7 +249,7 @@ const swaggerDoc = {
         },
       },
     },
-    '/7tv/usersubscriptioninfo': {
+    '/7tv/UserSubscriptionInfo': {
       get: {
         tags: ['7TV: User'],
         summary: 'Get 7TV subscription info',
@@ -262,7 +262,7 @@ const swaggerDoc = {
         },
       },
     },
-    '/7tv/userroles': {
+    '/7tv/UserRoles': {
       get: {
         tags: ['7TV: User'],
         summary: 'Get users 7TV roles',
@@ -275,7 +275,7 @@ const swaggerDoc = {
         },
       },
     },
-    '/7tv/badgespaints': {
+    '/7tv/BadgesPaints': {
       get: {
         tags: ['7TV: Global'],
         summary: 'Get all 7TV badges and paints',
@@ -287,7 +287,7 @@ const swaggerDoc = {
         },
       },
     },
-    '/misc/misc': {
+    '/misc/Misc': {
       get: {
         tags: ['Misc'],
         summary: 'API info',

@@ -9,6 +9,8 @@ const getGameInfoQuery = require('./gameInfoQuery');
 const getUserFollowsQuery = require('./userFollowsQuery');
 const getUserFollowersQuery = require('./userFollowersQuery');
 const getClipInfoQuery = require('./clipInfoQuery');
+const getUserRecentFollowQuery = require('./userRecentFollowQuery');
+const getUserFirstFollowQuery = require('./userFirstFollowQuery');
 
 
 module.exports = {
@@ -23,4 +25,6 @@ module.exports = {
   getUserFollowsQuery,
   getUserFollowersQuery,
   getClipInfoQuery,
+  getUserRecentFollowQuery,
+  getUserFirstFollowQuery,
 };

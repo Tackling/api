@@ -478,6 +478,104 @@ router.get('/userfollowers', async (req, res) => {
   }
 });
 
+router.get('/userrecentfollows', async (req, res) => {
+  const login = req.query.login;
+  if (!login) return res.status(400).json({ error: 'Missing ?login=' });
+
+  try {
+    const gqlQuery = gql.getUserRecentFollowQuery(login);
+
+    const response = await axios.post(TWITCH_GQL_URL, gqlQuery, axiosOptions);
+    const data = response.data?.data;
+    const user = data?.user;
+
+    if (!user || !user.follows || !user.followers) {
+      return res.status(404).json({ error: 'User, follows, or followers not found' });
+    }
+
+    const latestFollower = user.followers.edges[0] || null;
+    const latestFollow = user.follows.edges[0] || null;
+
+    res.json({
+      follower: latestFollower
+        ? {
+            followedAt: latestFollower.followedAt,
+            user: {
+              id: latestFollower.node.id,
+              login: latestFollower.node.login,
+              displayName: latestFollower.node.displayName
+            }
+          }
+        : null,
+      follow: latestFollow
+        ? {
+            followedAt: latestFollow.followedAt,
+            user: {
+              id: latestFollow.node.id,
+              login: latestFollow.node.login,
+              displayName: latestFollow.node.displayName
+            }
+          }
+        : null
+    });
+  } catch (err) {
+    console.error('Request failed:', err.response?.data || err.message);
+    res.status(500).json({
+      error: 'Twitch request failed',
+      details: err.response?.data || err.message
+    });
+  }
+});
+
+router.get('/userfirstfollows', async (req, res) => {
+  const login = req.query.login;
+  if (!login) return res.status(400).json({ error: 'Missing ?login=' });
+
+  try {
+    const gqlQuery = gql.getUserFirstFollowQuery(login);
+
+    const response = await axios.post(TWITCH_GQL_URL, gqlQuery, axiosOptions);
+    const data = response.data?.data;
+    const user = data?.user;
+
+    if (!user || !user.follows || !user.followers) {
+      return res.status(404).json({ error: 'User, follows, or followers not found' });
+    }
+
+    const latestFollower = user.followers.edges[0] || null;
+    const latestFollow = user.follows.edges[0] || null;
+
+    res.json({
+      follower: latestFollower
+        ? {
+            followedAt: latestFollower.followedAt,
+            user: {
+              id: latestFollower.node.id,
+              login: latestFollower.node.login,
+              displayName: latestFollower.node.displayName
+            }
+          }
+        : null,
+      follow: latestFollow
+        ? {
+            followedAt: latestFollow.followedAt,
+            user: {
+              id: latestFollow.node.id,
+              login: latestFollow.node.login,
+              displayName: latestFollow.node.displayName
+            }
+          }
+        : null
+    });
+  } catch (err) {
+    console.error('Request failed:', err.response?.data || err.message);
+    res.status(500).json({
+      error: 'Twitch request failed',
+      details: err.response?.data || err.message
+    });
+  }
+});
+
 router.get('/userinfo', async (req, res) => {
   const login = req.query.login;
   if (!login) return res.status(400).json({ error: 'Missing ?login=' });

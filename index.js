@@ -120,6 +120,32 @@ const swaggerDoc = {
         },
       },
     },
+     '/twitch/UserRecentFollows': {
+      get: {
+        tags: ['Twitch: User'],
+        summary: 'Get a users recent Twitch follows',
+        parameters: [{ name: 'login', in: 'query', required: true, schema: { type: 'string' } }],
+        responses: {
+          200: {
+            description: 'Get a users most recent Twitch follower and follow',
+            content: { 'application/json': { schema: { type: 'object' } } },
+          },
+        },
+      },
+    },
+     '/twitch/UserFirstFollows': {
+      get: {
+        tags: ['Twitch: User'],
+        summary: 'Get a users first Twitch follows',
+        parameters: [{ name: 'login', in: 'query', required: true, schema: { type: 'string' } }],
+        responses: {
+          200: {
+            description: 'Get a users first Twitch follower and follow',
+            content: { 'application/json': { schema: { type: 'object' } } },
+          },
+        },
+      },
+    },
     '/twitch/modvip': {
       get: {
         tags: ['Twitch: Channel'],

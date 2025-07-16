@@ -223,6 +223,19 @@ const swaggerDoc = {
         },
       },
     },
+    '/twitch/UsernameAvailable': {
+      get: {
+        tags: ['Twitch: Global'],
+        summary: 'Get if a Twitch username is available or not',
+        parameters: [{ name: 'username', in: 'query', required: true, schema: { type: 'string' } }],
+        responses: {
+          200: {
+            description: 'Get if a Twitch username is available or not',
+            content: { 'application/json': { schema: { type: 'object' } } },
+          },
+        },
+      },
+    },
     '/twitch/GameInfo': {
       get: {
         tags: ['Twitch: Global'],

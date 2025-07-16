@@ -8,6 +8,7 @@ const TWITCH_GQL_URL = 'https://gql.twitch.tv/gql';
 const axiosOptions = {
   headers: {
     'Client-ID': process.env.TWITCH_CLIENT_ID,
+    Authorization: `Bearer ${process.env.TWITCH_OAUTH_TOKEN}`,
     'Content-Type': 'application/json',
   },
 };
@@ -69,12 +70,14 @@ router.get('/userbadges', async (req, res) => {
 
   try {
     const response = await axios.post(TWITCH_GQL_URL, gqlQuery, axiosOptions);
-    const earnedBadges = response.data?.data?.channelViewer?.earnedBadges || [];
-    const totalBadges = new Set(earnedBadges.map(badge => badge.setID)).size;
+    const rawBadges = response.data?.data?.channelViewer?.earnedBadges || [];
+
+    const badges = rawBadges.map(({ __typename, ...badge }) => badge);
+    const totalBadges = new Set(badges.map(b => b.setID)).size;
 
     res.json({
       totalBadges,
-      earnedBadges
+      badges
     });
   } catch (err) {
     res.status(500).json({
@@ -92,6 +95,7 @@ router.get('/pinnedmessage', async (req, res) => {
   }
 
   try {
+    // Step 1: Get user ID from username
     const useLiveQuery = gql.getUseLiveQuery(username);
     const useLiveResponse = await axios.post(TWITCH_GQL_URL, useLiveQuery, axiosOptions);
 
@@ -101,6 +105,8 @@ router.get('/pinnedmessage', async (req, res) => {
     }
 
     const channelID = user.id;
+
+    // Step 2: Use channel ID to get pinned messages
     const pinnedQuery = gql.getPinnedMessageQuery(channelID);
     const pinnedResponse = await axios.post(TWITCH_GQL_URL, pinnedQuery, axiosOptions);
 
@@ -126,6 +132,90 @@ router.get('/pinnedmessage', async (req, res) => {
 
     res.json({ pinnedmessage });
 
+  } catch (err) {
+    res.status(500).json({
+      error: 'Twitch request failed',
+      details: err.response?.data || err.message,
+    });
+  }
+});
+
+router.get('/team', async (req, res) => {
+  const teamName = req.query.team;
+
+  if (!teamName) return res.status(400).json({ error: 'Missing ?team=' });
+
+  try {
+    let allMembers = [];
+    let allLiveMembers = [];
+    let afterMembers = null;
+    let afterLive = null;
+    let teamData = null;
+
+    do {
+      const gqlQuery = gql.getTeamInfoQuery(teamName, afterMembers, afterLive)[0];
+      const response = await axios.post(TWITCH_GQL_URL, gqlQuery, axiosOptions);
+
+      teamData = response.data?.data?.team;
+      if (!teamData) {
+        return res.status(404).json({ error: 'Team not found' });
+      }
+
+      const membersEdges = teamData.members?.edges || [];
+      allMembers.push(...membersEdges.map(edge => edge.node));
+      afterMembers = teamData.members?.pageInfo?.hasNextPage ? teamData.members.pageInfo.endCursor : null;
+
+      const liveMembersEdges = teamData.liveMembers?.edges || [];
+      allLiveMembers.push(...liveMembersEdges.map(edge => edge.node));
+      afterLive = teamData.liveMembers?.pageInfo?.hasNextPage ? teamData.liveMembers.pageInfo.endCursor : null;
+
+    } while (afterMembers || afterLive);
+
+    const owner = teamData.owner || null;
+
+    const output = {
+      team: {
+        id: teamData.id,
+        name: teamData.name,
+        displayName: teamData.displayName,
+        description: teamData.description,
+        backgroundImageID: teamData.backgroundImageID,
+        backgroundImageURL: teamData.backgroundImageURL,
+        bannerID: teamData.bannerID,
+        bannerURL: teamData.bannerURL,
+        logoID: teamData.logoID,
+        logoURL: teamData.logoURL,
+        liveMembers: allLiveMembers,
+        liveFeaturedChannels: (teamData.liveFeaturedChannels?.edges || []).map(edge => edge.node),
+      },
+      owner,
+      members: {
+        totalCount: teamData.members?.totalCount || 0,
+        list: allMembers
+      }
+    };
+
+    res.json(output);
+  } catch (err) {
+    res.status(500).json({
+      error: 'Twitch request failed',
+      details: err.response?.data || err.message,
+    });
+  }
+});
+
+router.get('/globalbadges', async (req, res) => {
+  const gqlQuery = gql.getGlobalBadgesQuery();
+
+  try {
+    const response = await axios.post(TWITCH_GQL_URL, gqlQuery, axiosOptions);
+    const badges = response.data?.data?.badges;
+
+    if (!badges) {
+      return res.status(404).json({ error: 'Badges not found' });
+    }
+
+    res.json(badges);
   } catch (err) {
     res.status(500).json({
       error: 'Twitch request failed',
@@ -196,89 +286,6 @@ router.get('/clipinfo', async (req, res) => {
     };
 
     res.json(formatted);
-  } catch (err) {
-    res.status(500).json({
-      error: 'Twitch request failed',
-      details: err.response?.data || err.message,
-    });
-  }
-});
-
-router.get('/team', async (req, res) => {
-  const teamName = req.query.team;
-
-  if (!teamName) return res.status(400).json({ error: 'Missing ?team=' });
-
-  try {
-    let allMembers = [];
-    let allLiveMembers = [];
-    let afterMembers = null;
-    let afterLive = null;
-    let teamData = null;
-
-    do {
-      const gqlQuery = gql.getTeamInfoQuery(teamName, afterMembers, afterLive)[0];
-      const response = await axios.post(TWITCH_GQL_URL, gqlQuery, axiosOptions);
-      console.log(JSON.stringify(response.data, null, 2));
-
-      teamData = response.data?.data?.team;
-      if (!teamData) {
-        return res.status(404).json({ error: 'Team not found' });
-      }
-
-      const membersEdges = teamData.members?.edges || [];
-      allMembers.push(...membersEdges.map(edge => edge.node));
-      afterMembers = teamData.members?.pageInfo?.hasNextPage ? teamData.members.pageInfo.endCursor : null;
-
-      const liveMembersEdges = teamData.liveMembers?.edges || [];
-      allLiveMembers.push(...liveMembersEdges.map(edge => edge.node));
-      afterLive = teamData.liveMembers?.pageInfo?.hasNextPage ? teamData.liveMembers.pageInfo.endCursor : null;
-
-    } while (afterMembers || afterLive);
-
-    const owner = teamData.owner || null;
-
-    const output = {
-      totalCount: teamData.members?.totalCount || 0,
-      team: {
-        id: teamData.id,
-        name: teamData.name,
-        displayName: teamData.displayName,
-        description: teamData.description,
-        backgroundImageID: teamData.backgroundImageID,
-        backgroundImageURL: teamData.backgroundImageURL,
-        bannerID: teamData.bannerID,
-        bannerURL: teamData.bannerURL,
-        logoID: teamData.logoID,
-        logoURL: teamData.logoURL,
-        liveMembers: allLiveMembers,
-        liveFeaturedChannels: (teamData.liveFeaturedChannels?.edges || []).map(edge => edge.node),
-      },
-      owner,
-      members: allMembers,
-    };
-
-    res.json(output);
-  } catch (err) {
-    res.status(500).json({
-      error: 'Twitch request failed',
-      details: err.response?.data || err.message,
-    });
-  }
-});
-
-router.get('/globalbadges', async (req, res) => {
-  const gqlQuery = gql.getGlobalBadgesQuery();
-
-  try {
-    const response = await axios.post(TWITCH_GQL_URL, gqlQuery, axiosOptions);
-    const badges = response.data?.data?.badges;
-
-    if (!badges) {
-      return res.status(404).json({ error: 'Badges not found' });
-    }
-
-    res.json(badges);
   } catch (err) {
     res.status(500).json({
       error: 'Twitch request failed',
@@ -380,7 +387,6 @@ router.get('/userfollows', async (req, res) => {
       console.log(`Fetching follows for ${login}, after: ${after || 'null'}`);
 
       const gqlQuery = gql.getUserFollowsQuery(login, after);
-
       const response = await axios.post(TWITCH_GQL_URL, gqlQuery, axiosOptions);
       const userData = response.data?.data?.user;
 
@@ -396,18 +402,15 @@ router.get('/userfollows', async (req, res) => {
       after = follows.pageInfo.endCursor;
     }
 
-res.json({
-  totalCount: allFollows.length,
-  edges: allFollows.map(edge => ({
-    node: {
-      id: edge.node.id,
-      login: edge.node.login,
-      displayName: edge.node.displayName,
-      followedAt: edge.followedAt
-    }
-  }))
-});
-
+    res.json({
+      totalCount: allFollows.length,
+      follows: allFollows.map(edge => ({
+        id: edge.node.id,
+        login: edge.node.login,
+        displayName: edge.node.displayName,
+        followedAt: edge.followedAt
+      }))
+    });
   } catch (err) {
     console.error('Request failed:', err.response?.data || err.message);
     res.status(500).json({

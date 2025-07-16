@@ -272,14 +272,13 @@ router.get('/globalbadges', async (req, res) => {
 
   try {
     const response = await axios.post(TWITCH_GQL_URL, gqlQuery, axiosOptions);
+    const badges = response.data?.data?.badges;
 
-    const { data } = response;
-
-    if (data.extensions) {
-      delete data.extensions;
+    if (!badges) {
+      return res.status(404).json({ error: 'Badges not found' });
     }
 
-    res.json(data);
+    res.json(badges);
   } catch (err) {
     res.status(500).json({
       error: 'Twitch request failed',

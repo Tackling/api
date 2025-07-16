@@ -384,14 +384,12 @@ router.get('/userfollows', async (req, res) => {
 
   try {
     while (hasNextPage) {
-      console.log(`Fetching follows for ${login}, after: ${after || 'null'}`);
 
       const gqlQuery = gql.getUserFollowsQuery(login, after);
       const response = await axios.post(TWITCH_GQL_URL, gqlQuery, axiosOptions);
       const userData = response.data?.data?.user;
 
       if (!userData || !userData.follows) {
-        console.error('User or follows not found in response:', response.data);
         return res.status(404).json({ error: 'User or follows not found' });
       }
 

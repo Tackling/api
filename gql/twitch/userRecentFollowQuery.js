@@ -2,7 +2,7 @@ module.exports = function userRecentFollowsQuery(login) {
   return {
     query: `
       query FollowersAndFollows($login: String!) {
-        user(login: $login) {
+        user(login: $login, lookupType: ALL) {
           followers(first: 1, order: DESC) {
             edges {
               followedAt

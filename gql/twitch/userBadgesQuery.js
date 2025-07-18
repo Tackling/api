@@ -6,7 +6,8 @@ module.exports = function getUserBadgesQuery(channelLogin, targetLogin) {
       channelIDStr: "1",
       channelLogin: channelLogin,
       targetLogin: targetLogin,
-      isViewerBadgeCollectionEnabled: true
+      isViewerBadgeCollectionEnabled: true,
+      lookupType: 'ALL',
     },
     extensions: {
       persistedQuery: {

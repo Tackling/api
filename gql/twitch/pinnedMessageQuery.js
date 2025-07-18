@@ -2,7 +2,7 @@ function getUseLiveQuery(username) {
   return [
     {
       operationName: "UseLive",
-      variables: { channelLogin: username },
+      variables: { channelLogin: username, lookupType: 'ALL', },
       extensions: {
         persistedQuery: {
           version: 1,
@@ -17,7 +17,7 @@ function getPinnedMessageQuery(channelID) {
   return [
     {
       operationName: "GetPinnedChat",
-      variables: { channelID, count: 1 },
+      variables: { channelID, count: 1, lookupType: 'ALL', },
       extensions: {
         persistedQuery: {
           version: 1,

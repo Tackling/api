@@ -2,7 +2,7 @@ module.exports = function getUserInfoQuery(username) {
   return [
     {
       operationName: 'ChannelShell',
-      variables: { login: username },
+      variables: { login: username, lookupType: 'ALL' },
       extensions: {
         persistedQuery: {
           version: 1,
@@ -12,10 +12,10 @@ module.exports = function getUserInfoQuery(username) {
     },
     {
       operationName: 'UserQuery',
-      variables: { login: username },
+      variables: { login: username, lookupType: 'ALL' },
       query: `
-        query UserQuery($login: String!) {
-          user(login: $login) {
+        query UserQuery($login: String!, $lookupType: UserLookupType) {
+          user(login: $login, lookupType: $lookupType) {
             id
             login
             displayName
@@ -50,31 +50,31 @@ module.exports = function getUserInfoQuery(username) {
               displayName
               backgroundImageURL
             }
-            displayBadges{
-             id
-             setID
-             title
-             description
-             imageURL
-            } 
+            displayBadges {
+              id
+              setID
+              title
+              description
+              imageURL
+            }
             stream {
               id
-      type
-      title
-      viewersCount
-      createdAt
-      clipCount
-      averageFPS
-      bitrate
-      isDirectoryHidden
-      broadcasterSoftware
-      isEncrypted
-      isMature
-      language
-      restrictionType
-      codec
-      height
-      width
+              type
+              title
+              viewersCount
+              createdAt
+              clipCount
+              averageFPS
+              bitrate
+              isDirectoryHidden
+              broadcasterSoftware
+              isEncrypted
+              isMature
+              language
+              restrictionType
+              codec
+              height
+              width
               game {
                 name
                 id
@@ -90,16 +90,16 @@ module.exports = function getUserInfoQuery(username) {
               }
             }
             chatSettings {
-            rules
-            chatDelayMs
-            slowModeDurationSeconds
-            isFastSubsModeEnabled
-            isUniqueChatModeEnabled
-            isEmoteOnlyModeEnabled
-            followersOnlyDurationMinutes
-            requireVerifiedAccount
-            blockLinks
-            accountVerificationOptions {
+              rules
+              chatDelayMs
+              slowModeDurationSeconds
+              isFastSubsModeEnabled
+              isUniqueChatModeEnabled
+              isEmoteOnlyModeEnabled
+              followersOnlyDurationMinutes
+              requireVerifiedAccount
+              blockLinks
+              accountVerificationOptions {
                 emailVerificationMode
                 partialEmailVerificationConfig {
                   minimumAccountAgeInMinutes
@@ -133,23 +133,22 @@ module.exports = function getUserInfoQuery(username) {
               }
             }
             channel {
-      founderBadgeAvailability
-      chatters {
-        count
-      }
-    }
-    settings {
-      leaderboard {
-        isCheerEnabled
-        isSubGiftEnabled
-        isClipEnabled
-        defaultLeaderboard
-        timePeriod
-      }
-    }
-  }
-}
-
+              founderBadgeAvailability
+              chatters {
+                count
+              }
+            }
+            settings {
+              leaderboard {
+                isCheerEnabled
+                isSubGiftEnabled
+                isClipEnabled
+                defaultLeaderboard
+                timePeriod
+              }
+            }
+          }
+        }
       `,
     },
     {
@@ -160,6 +159,7 @@ module.exports = function getUserInfoQuery(username) {
         channelLogin: 'browser',
         targetLogin: username,
         isViewerBadgeCollectionEnabled: true,
+        lookupType: 'ALL',
       },
       extensions: {
         persistedQuery: {

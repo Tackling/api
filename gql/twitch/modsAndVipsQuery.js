@@ -2,7 +2,7 @@ module.exports = function modsAndVipsQuery(targetUsername) {
   return {
     query: `
       query {
-        user(login: "${targetUsername}") {
+        user(login: "${targetUsername}", lookupType: ALL) {
           mods: mods(first: 100) {
             edges {
               grantedAt

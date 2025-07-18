@@ -2,7 +2,7 @@ module.exports = function getUserFollowsQuery(login, after = null) {
   return {
     query: `
       query Follows($login: String!, $after: Cursor) {
-        user(login: $login) {
+        user(login: $login, lookupType: ALL) {
           follows(first: 100, after: $after, order: DESC) {
             totalCount
             edges {

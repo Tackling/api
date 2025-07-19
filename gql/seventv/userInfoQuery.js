@@ -63,6 +63,16 @@ function getUserInfoQuery(userId) {
               }
               addedAt
             }
+            style {
+              activeBadge {
+                name
+                id
+              }
+              activePaint {
+                name
+                id
+              }
+            }
           }
         }
       }

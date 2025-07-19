@@ -8,7 +8,9 @@ const SEVENTV_GQL_URL = 'https://7tv.io/v4/gql';
 const axiosOptions = {
   headers: {
     'Content-Type': 'application/json',
+    'Accept-Encoding': 'gzip, deflate, br'
   },
+  decompress: true
 };
 
 router.get('/badgespaints', async (req, res) => {
@@ -80,7 +82,6 @@ router.get('/userinfo', async (req, res) => {
   if (!login) return res.status(400).json({ error: 'Missing ?login=' });
 
   try {
-    // Step 1: Get the user ID
     const searchQuery = gql.getUserIdQuery(login);
     const searchRes = await axios.post(SEVENTV_GQL_URL, searchQuery, axiosOptions);
     const items = searchRes.data?.data?.users?.search?.items ?? [];
@@ -94,8 +95,6 @@ router.get('/userinfo', async (req, res) => {
     }
 
     const userId = match.id;
-
-    // Step 2: Get user info including inventory, roles, connections, editors
     const userInfoQuery = gql.getUserInfoQuery(userId);
     const userInfoRes = await axios.post(SEVENTV_GQL_URL, userInfoQuery, axiosOptions);
     const userData = userInfoRes.data?.data?.users?.user;
@@ -109,33 +108,37 @@ router.get('/userinfo', async (req, res) => {
     const editorFor = userData.editorFor ?? [];
     const badges = (userData.inventory?.badges ?? []).map((entry) => entry.to?.badge).filter(Boolean);
     const paints = (userData.inventory?.paints ?? []).map((entry) => entry.to?.paint).filter(Boolean);
+    const activeBadge = userData.style?.activeBadge ?? null;
+    const activePaint = userData.style?.activePaint ?? null;
 
-const response = {
-  id: userId,
-  username: match.mainConnection?.platformUsername ?? null,
-  roles: {
-    total: roles.length,
-    roles: roles,
-  },
-  connections,
-  editorFor: {
-    total: editorFor.length,
-    users: editorFor.map((editor) => ({
-      userId: editor.userId,
-      platformUsername: editor.user?.mainConnection?.platformUsername ?? null,
-      platform: editor.user?.mainConnection?.platform ?? null,
-      addedAt: editor.addedAt,
-    })),
-  },
- badges: {
-    total: badges.length,
-    items: badges,
-  },
-  paints: {
-    total: paints.length,
-    items: paints,
-  },
-};
+    const response = {
+      id: userId,
+      username: match.mainConnection?.platformUsername ?? null,
+      roles: {
+        total: roles.length,
+        roles: roles,
+      },
+      connections,
+      editorFor: {
+        total: editorFor.length,
+        users: editorFor.map((editor) => ({
+          userId: editor.userId,
+          platformUsername: editor.user?.mainConnection?.platformUsername ?? null,
+          platform: editor.user?.mainConnection?.platform ?? null,
+          addedAt: editor.addedAt,
+        })),
+      },
+      badges: {
+        total: badges.length,
+        active: activeBadge,
+        items: badges,
+      },
+      paints: {
+        total: paints.length,
+        active: activePaint,
+        items: paints,
+      },
+    };
 
     res.json(response);
   } catch (err) {
